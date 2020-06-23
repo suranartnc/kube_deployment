@@ -1,0 +1,91 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "deno",
+        "labels": {
+          "name": "deno"
+        }
+      }
+    },
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "deno-proxy",
+        "namespace": "deno"
+      },
+      "spec": {
+        "ports": [
+          {
+            "protocol": "TCP",
+            "port": 80,
+            "targetPort": 80
+          }
+        ],
+        "selector": {
+          "app": "deno-proxy"
+        }
+      }
+    },
+    {
+      "kind": "Deployment",
+      "apiVersion": "apps/v1",
+      "metadata": {
+        "name": "deno-proxy",
+        "namespace": "deno",
+        "labels": {
+          "app": "deno-proxy"
+        }
+      },
+      "spec": {
+        "replicas": 5,
+        "selector": {
+          "matchLabels": {
+            "app": "deno-proxy"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "deno-proxy"
+            }
+          },
+          "spec": {
+            "volumes": [
+              {
+                "name": "deno-proxy",
+                "configMap": {
+                  "name": "deno-proxy",
+                  "defaultMode": 420
+                }
+              }
+            ],
+            "containers": [
+              {
+                "name": "deno-proxy",
+                "image": "nginx:stable-alpine",
+                "ports": [
+                  {
+                    "containerPort": 80,
+                    "protocol": "TCP"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "deno-proxy",
+                    "mountPath": "/etc/nginx/conf.d"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

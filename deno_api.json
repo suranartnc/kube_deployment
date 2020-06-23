@@ -1,0 +1,76 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "deno",
+        "labels": {
+          "name": "deno"
+        }
+      }
+    },
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "deno-api",
+        "namespace": "deno"
+      },
+      "spec": {
+        "ports": [
+          {
+            "protocol": "TCP",
+            "port": 8000,
+            "targetPort": 8000
+          }
+        ],
+        "selector": {
+          "app": "deno-api"
+        }
+      }
+    },
+    {
+      "kind": "Deployment",
+      "apiVersion": "apps/v1",
+      "metadata": {
+        "name": "deno-api",
+        "namespace": "deno",
+        "labels": {
+          "app": "deno-api"
+        }
+      },
+      "spec": {
+        "replicas": 5,
+        "selector": {
+          "matchLabels": {
+            "app": "deno-api"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "deno-api"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "deno-api",
+                "image": "topclassic/deno-starter",
+                "ports": [
+                  {
+                    "containerPort": 8000,
+                    "protocol": "TCP"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
